@@ -1,15 +1,16 @@
-// Licensed under the Dartastic Pro Software License Agreement.
+// Licensed under the Apache License, Version 2.0
 // Copyright 2025-2026 Mindful Software LLC d/b/a Dartastic.io, All rights reserved.
 
-import 'package:dartastic_opentelemetry/dartastic_opentelemetry.dart';
+import 'package:dartastic_opentelemetry_api/dartastic_opentelemetry_api.dart';
 
 import 'otel_phrase_suppression.dart';
 
 const _tracerName = 'dartastic_otel_libs_phrase';
 
-Tracer _tracer() => OTel.tracerProvider().getTracer(_tracerName);
+APITracer _tracer() => OTelAPI.tracerProvider().getTracer(_tracerName);
 
 class PhraseResult {
+  /// Creates a result.
   const PhraseResult({
     this.accountId,
     this.productLine,
@@ -79,8 +80,13 @@ class PhraseResult {
   final int? statusCode;
 }
 
+/// What a traced call returned: the value for the caller plus fields
+/// recorded on the span.
 class PhraseCallResult<T> {
+  /// Creates a call result.
   const PhraseCallResult({required this.value, this.result});
+
+  /// The value returned to the caller.
   final T value;
   final PhraseResult? result;
 }
@@ -108,74 +114,74 @@ Future<T> tracedPhrase<T>({
   final span = _tracer().startSpan(
     'phrase $operation',
     kind: SpanKind.client,
-    attributes: OTel.attributesFromMap(m),
+    attributes: OTelAPI.attributesFromMap(m),
   );
   try {
     final r = await invoke();
     if (r.result != null) {
       final extras = <Attribute<Object>>[];
       if (r.result!.accountId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'phrase.account.id',
           r.result!.accountId!,
         ));
       }
       if (r.result!.productLine != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'phrase.product_line',
           r.result!.productLine!,
         ));
       }
       if (r.result!.projectId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'phrase.project.id',
           r.result!.projectId!,
         ));
       }
       if (r.result!.entityKind != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'phrase.entity.kind',
           r.result!.entityKind!,
         ));
       }
       if (r.result!.entityId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'phrase.entity.id',
           r.result!.entityId!,
         ));
       }
       if (r.result!.keyId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'phrase.key.id',
           r.result!.keyId!,
         ));
       }
       if (r.result!.branchName != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'phrase.branch.name',
           r.result!.branchName!,
         ));
       }
       if (r.result!.localeId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'phrase.locale.id',
           r.result!.localeId!,
         ));
       }
       if (r.result!.localeCode != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'phrase.locale.code',
           r.result!.localeCode!,
         ));
       }
       if (r.result!.jobId != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'phrase.job.id',
           r.result!.jobId!,
         ));
       }
       if (r.result!.jobStatus != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'phrase.job.status',
           r.result!.jobStatus!,
         ));
@@ -187,37 +193,37 @@ Future<T> tracedPhrase<T>({
         }
       }
       if (r.result!.workflowStep != null) {
-        extras.add(OTel.attributeString(
+        extras.add(OTelAPI.attributeString(
           'phrase.workflow_step',
           r.result!.workflowStep!,
         ));
       }
       if (r.result!.fuzzyAnalysisWordsTotal != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'phrase.analysis.words_total',
           r.result!.fuzzyAnalysisWordsTotal!,
         ));
       }
       if (r.result!.fuzzyAnalysisNewWords != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'phrase.analysis.new_words',
           r.result!.fuzzyAnalysisNewWords!,
         ));
       }
       if (r.result!.fuzzyAnalysisMatch100 != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'phrase.analysis.match_100',
           r.result!.fuzzyAnalysisMatch100!,
         ));
       }
       if (r.result!.tmEnabled != null) {
-        extras.add(OTel.attributeBool(
+        extras.add(OTelAPI.attributeBool(
           'phrase.tm.enabled',
           r.result!.tmEnabled!,
         ));
       }
       if (r.result!.statusCode != null) {
-        extras.add(OTel.attributeInt(
+        extras.add(OTelAPI.attributeInt(
           'http.response.status_code',
           r.result!.statusCode!,
         ));
@@ -228,13 +234,13 @@ Future<T> tracedPhrase<T>({
           );
         }
       }
-      if (extras.isNotEmpty) span.addAttributes(OTel.attributes(extras));
+      if (extras.isNotEmpty) span.addAttributes(OTelAPI.attributes(extras));
     }
     return r.value;
   } catch (e, st) {
-    span.addAttributes(OTel.attributes([
-      OTel.attributeString(
-        ErrorResource.errorType.key,
+    span.addAttributes(OTelAPI.attributes([
+      OTelAPI.attributeString(
+        ErrorAttributes.errorType.key,
         e.runtimeType.toString(),
       ),
     ]));
